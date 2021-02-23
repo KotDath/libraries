@@ -5,7 +5,7 @@
 #include <cstdlib>
 #include <ctime>
 
-using std::cin;
+using std::cin;  //!!! Не нужно использовать using в глоьальном пространстве. Лучше везде писать явно std::
 using std::cout;
 
 void GenerateArray(int* array, int size) {
@@ -52,8 +52,15 @@ int main() {
     
     HINSTANCE SortLib = LoadLibrary(TEXT(".\\..\\Dynamic_explicit\\Debug\\Dexplicit.dll"));
     if (SortLib != nullptr) {
+        //!!! Лучше писать так:
+        //!!! typedef void (*FuncType)(int*, int);
+        //!!! FuncType sortAlgo = (FuncType)GetProcAddress(SortLib, "Sort");
+        
         void (*sortAlgo)(int*, int);
         sortAlgo = (void(*)(int*, int))(GetProcAddress(SortLib, "Sort"));
+        
+        //!!! Нет проверки sortAlgo на nullptr. Вдруг такой функции нет в dll.
+        
         sortAlgo(array, n);
         FreeLibrary(SortLib);
         cout << "Result of sort algo from dynamic lib with explicit link:\n";
