@@ -1,3 +1,3 @@
 #pragma once
 
-__declspec(dllexport) void sortDyn(int*, int);
+__declspec(dllexport) void SortDyn(int*, int);

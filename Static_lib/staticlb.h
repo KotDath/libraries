@@ -1,3 +1,3 @@
 #pragma once
 
-void sort(int*, int);
+void Sort(int*, int);

@@ -1,3 +1,3 @@
 #pragma once
 
-extern "C" __declspec(dllexport) void sort(int*, int);
+extern "C" __declspec(dllexport) void Sort(int*, int);
