@@ -1,4 +1,4 @@
-#include "DynSortImp.h"
+#include "DynSort.h"
 
 void SortDyn(int* array, int size) {
     for (int i = 0; i < size; ++i) {

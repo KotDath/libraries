@@ -1,12 +1,11 @@
 #include <iostream>
-#include "DynSortImp.h"
+#include "DynSort.h"
 #include "staticlb.h"
 #include <windows.h>
 #include <cstdlib>
 #include <ctime>
 
-using std::cin;  //!!! Не нужно использовать using в глоьальном пространстве. Лучше везде писать явно std::
-using std::cout;
+typedef void (*SortFunction)(int*, int);
 
 void GenerateArray(int* array, int size) {
     for (int i = 0; i < size; ++i) {
@@ -24,54 +23,52 @@ int* CopyArray(int* array, int size) {
 
 void OutputArray(int* array, int size) {
     for (int i = 0; i < size; ++i) {
-        cout << array[i] << ' ';
+        std::cout << array[i] << ' ';
     }
-    cout << std::endl;
+    std::cout << std::endl;
 }
 
 int main() {
     srand(time(nullptr));
     int n;
-    cout << "Enter array size: ";
-    cin >> n;
+    std::cout << "Enter array size: ";
+    std::cin >> n;
 
     int* array = new int[n];
     GenerateArray(array, n);
     int* arrayForStaticLib = CopyArray(array, n);
     int* arrayForImplicitDll = CopyArray(array, n);
 
-    cout << "Input array:\n";
+    std::cout << "Input array:\n";
     OutputArray(array, n);
 
     Sort(arrayForStaticLib, n);
     SortDyn(arrayForImplicitDll, n);
-    cout << "Result of sort algo from static lib:\n";
+    std::cout << "Result of Sort algo from static lib:\n";
     OutputArray(arrayForStaticLib, n);
-    cout << "Result of sort algo from dynamic lib with implicit link:\n";
+    std::cout << "Result of Sort algo from dynamic lib with implicit link:\n";
     OutputArray(arrayForImplicitDll, n);
-    
-    HINSTANCE SortLib = LoadLibrary(TEXT(".\\..\\Dynamic_explicit\\Debug\\Dexplicit.dll"));
-    if (SortLib != nullptr) {
-        //!!! Лучше писать так:
-        //!!! typedef void (*FuncType)(int*, int);
-        //!!! FuncType sortAlgo = (FuncType)GetProcAddress(SortLib, "Sort");
-        
-        void (*sortAlgo)(int*, int);
-        sortAlgo = (void(*)(int*, int))(GetProcAddress(SortLib, "Sort"));
-        
-        //!!! Нет проверки sortAlgo на nullptr. Вдруг такой функции нет в dll.
-        
-        sortAlgo(array, n);
-        FreeLibrary(SortLib);
-        cout << "Result of sort algo from dynamic lib with explicit link:\n";
-        OutputArray(array, n);
 
+    HINSTANCE SortLib = LoadLibrary(TEXT(".\\..\\Dynamic_lib\\Debug\\Dynamic.dll"));
+    if (SortLib != nullptr) {
+        SortFunction sortAlgo = (SortFunction) GetProcAddress(SortLib, "SortDyn");
+
+
+        if (sortAlgo == nullptr) {
+            std::cout << "Function with name \"SortDyn\" not found in Dynamic.dll\n";
+        } else {
+            sortAlgo(array, n);
+            std::cout << "Result of Sort algo from dynamic lib with explicit link:\n";
+            OutputArray(array, n);
+        }
+
+        FreeLibrary(SortLib);
     }
     else {
-        cout << "Error. Dexplicit.dll not found.\n";
+        std::cout << "Error. Dexplicit.dll not found.\n";
     }
-    
-    cout << "Put enter to exit: ";
+
+    std::cout << "Put enter to exit: ";
     getchar();
     getchar();
     delete[] arrayForImplicitDll;
@@ -79,4 +76,3 @@ int main() {
     delete[] array;
     return 0;
 }
-
