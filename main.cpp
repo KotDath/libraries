@@ -46,10 +46,11 @@ int main() {
     Sort(arrayForStaticLib, n);
     SortDyn(arrayForImplicitDll, n);
 
-    HINSTANCE hDLL = LoadLibrary(TEXT(".\\..\\Dynamic_explicit\\Debug\\Dexplicit.dll"));
+    HINSTANCE SortLib = LoadLibrary(TEXT(".\\..\\Dynamic_explicit\\Debug\\Dexplicit.dll"));
     void (*sortAlgo)(int*, int);
-    sortAlgo = (void(*)(int*, int))(GetProcAddress(hDLL, "Sort"));
+    sortAlgo = (void(*)(int*, int))(GetProcAddress(SortLib, "Sort"));
     sortAlgo(array, n);
+    FreeLibrary(SortLib);
 
     cout << "Result of sort algo from static lib:\n";
     OutputArray(arrayForStaticLib, n);
