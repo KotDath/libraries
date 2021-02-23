@@ -45,19 +45,25 @@ int main() {
 
     Sort(arrayForStaticLib, n);
     SortDyn(arrayForImplicitDll, n);
-
-    HINSTANCE SortLib = LoadLibrary(TEXT(".\\..\\Dynamic_explicit\\Debug\\Dexplicit.dll"));
-    void (*sortAlgo)(int*, int);
-    sortAlgo = (void(*)(int*, int))(GetProcAddress(SortLib, "Sort"));
-    sortAlgo(array, n);
-    FreeLibrary(SortLib);
-
     cout << "Result of sort algo from static lib:\n";
     OutputArray(arrayForStaticLib, n);
     cout << "Result of sort algo from dynamic lib with implicit link:\n";
     OutputArray(arrayForImplicitDll, n);
-    cout << "Result of sort algo from dynamic lib with explicit link:\n";
-    OutputArray(array, n);
+    
+    HINSTANCE SortLib = LoadLibrary(TEXT(".\\..\\Dynamic_explicit\\Debug\\Dexplicit.dll"));
+    if (SortLib != nullptr) {
+        void (*sortAlgo)(int*, int);
+        sortAlgo = (void(*)(int*, int))(GetProcAddress(SortLib, "Sort"));
+        sortAlgo(array, n);
+        FreeLibrary(SortLib);
+        cout << "Result of sort algo from dynamic lib with explicit link:\n";
+        OutputArray(array, n);
+
+    }
+    else {
+        cout << "Error. Dexplicit.dll not found.\n";
+    }
+    
     cout << "Put enter to exit: ";
     getchar();
     getchar();
